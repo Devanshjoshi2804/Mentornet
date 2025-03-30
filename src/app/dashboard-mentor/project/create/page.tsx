@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAccount } from "wagmi";
+// Comment out the real wagmi import
+// import { useAccount } from "wagmi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
@@ -27,8 +28,36 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { mentorDAO } from "@/lib/blockchain";
 import { Loader2 } from "lucide-react";
+
+// Mock implementation for useAccount
+const useAccount = () => {
+  return {
+    isConnected: true,
+    address: "0xf29bbCFB987F3618515ddDe75D6CAd34cc1855D7",
+  };
+};
+
+// Mock implementation for mentorDAO
+const mentorDAO = {
+  createProject: async (name: string, description: string, skillArea: string) => {
+    // Simulate a blockchain transaction
+    console.log("Creating project on blockchain (mock):", { name, description, skillArea });
+    // Return a mock success result with a transaction hash
+    return {
+      success: true,
+      txHash: "0x" + Math.random().toString(16).substring(2, 42),
+      message: "Project created successfully"
+    };
+  },
+  
+  saveProjectToDB: async (name: string, description: string, skillArea: string, mentorAddress: string, txHash: string) => {
+    // Simulate saving to a database
+    console.log("Saving project to database (mock):", { name, description, skillArea, mentorAddress, txHash });
+    // Return success
+    return true;
+  }
+};
 
 const projectFormSchema = z.object({
   projectName: z
