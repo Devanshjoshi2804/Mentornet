@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAccount } from "wagmi";
+// Remove the wagmi import
+// import { useAccount } from "wagmi";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,8 +11,53 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { useRegisterMentor, saveMentorToDB } from "@/lib/mentorUtils";
+// Comment out the conflicting import
+// import { useRegisterMentor, saveMentorToDB } from "@/lib/mentorUtils";
 import { useAuth } from "@/lib/auth";
+
+// Mock implementation for useAccount
+const useAccount = () => {
+  return {
+    isConnected: true,
+    address: "0xf29bbCFB987F3618515ddDe75D6CAd34cc1855D7",
+  };
+};
+
+// Also mock the useRegisterMentor hook
+const useRegisterMentor = () => {
+  const registerMentor = async (name: string, expertise: string, email: string) => {
+    // Just return a mock transaction hash
+    return "0x" + Math.random().toString(16).substring(2, 42);
+  };
+  
+  return {
+    registerMentor,
+    isLoading: false,
+    error: null
+  };
+};
+
+// Mock saveMentorToDB function
+const saveMentorToDB = async (mentorData: any) => {
+  console.log("Mock saving mentor data:", mentorData);
+  // Just return true to simulate success
+  return true;
+};
+
+// Also mock the useAuth hook
+const useAuth = () => {
+  return {
+    user: {
+      firstName: "Rohit",
+      lastName: "Shahi",
+      email: "rohit@example.com"
+    },
+    // Add other properties as needed
+    login: () => Promise.resolve(),
+    logout: () => Promise.resolve(),
+    register: () => Promise.resolve(),
+  };
+};
 
 // Form validation schema
 const formSchema = z.object({
