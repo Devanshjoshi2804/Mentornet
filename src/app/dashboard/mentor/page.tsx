@@ -1,181 +1,77 @@
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { MessageSquare, Laptop, BookOpen, Users } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function AIMentorPage() {
-  // ... existing code ...
-  
+export default function MentorPage() {
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-hidden">
-        <div className="grid h-full lg:grid-cols-[280px_1fr]">
-          {/* Chat History Sidebar */}
-          <div className="hidden lg:flex h-full flex-col border-r">
-            <div className="p-4 border-b">
-              <h2 className="text-lg font-semibold">Chat History</h2>
-              <p className="text-sm text-muted-foreground">Your previous conversations</p>
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">AI Mentor System</h1>
+      
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle>AI Chat</CardTitle>
+            <CardDescription>Ask questions anytime</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center">
+              <MessageSquare className="h-8 w-8 text-emerald-500" />
+              <Button>Start Chat</Button>
             </div>
-            
-            <div className="flex-1 overflow-auto py-2">
-              <div className="px-4 space-y-1">
-                <Button variant="secondary" className="w-full justify-start" onClick={handleNewChat}>
-                  <PlusIcon className="mr-2 h-4 w-4" />
-                  New Chat
-                </Button>
-              </div>
-              
-              <div className="mt-4 px-2 space-y-1">
-                {chatHistory.map((chat, index) => (
-                  <div
-                    key={index}
-                    className={`flex items-center justify-between rounded-md px-2 py-1.5 cursor-pointer ${
-                      activeChatIndex === index ? "bg-muted" : "hover:bg-muted/50"
-                    }`}
-                    onClick={() => setActiveChatIndex(index)}
-                  >
-                    <div className="flex items-center">
-                      <MessageSquareIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium truncate max-w-[180px]">
-                        {chat.title || "New conversation"}
-                      </span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 opacity-0 group-hover:opacity-100"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteChat(index);
-                      }}
-                    >
-                      <TrashIcon className="h-4 w-4" />
-                      <span className="sr-only">Delete</span>
-                    </Button>
-                  </div>
-                ))}
-              </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle>Courses</CardTitle>
+            <CardDescription>Your learning progress</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center">
+              <Laptop className="h-8 w-8 text-emerald-500" />
+              <Button variant="outline">View Courses</Button>
             </div>
-            
-            <div className="p-4 border-t">
-              <div className="flex items-center gap-2">
-                <div className="flex-1 truncate">
-                  <p className="text-sm font-medium">Current Mentor</p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {currentMentor?.name || "Choose a mentor"}
-                  </p>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="icon">
-                      <MoreVerticalIcon className="h-4 w-4" />
-                      <span className="sr-only">Menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Options</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={handleNewChat}>
-                      <PlusIcon className="mr-2 h-4 w-4" />
-                      New Chat
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <UsersIcon className="mr-2 h-4 w-4" />
-                      Change Mentor
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <SettingsIcon className="mr-2 h-4 w-4" />
-                      Settings
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle>Study Materials</CardTitle>
+            <CardDescription>Resources and guides</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center">
+              <BookOpen className="h-8 w-8 text-emerald-500" />
+              <Button variant="outline">Explore</Button>
             </div>
-          </div>
-          
-          {/* Main Chat Area */}
-          <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between border-b p-4">
-              <div>
-                <h2 className="text-lg font-semibold">AI Mentor Chat</h2>
-                <p className="text-sm text-muted-foreground">
-                  Chat with your personalized AI Mentor
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="lg:hidden">
-                  <ClockIcon className="h-4 w-4" />
-                  <span className="sr-only">History</span>
-                </Button>
-                <Button variant="ghost" size="icon">
-                  <SettingsIcon className="h-4 w-4" />
-                  <span className="sr-only">Settings</span>
-                </Button>
-              </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle>Community</CardTitle>
+            <CardDescription>Connect with peers</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center">
+              <Users className="h-8 w-8 text-emerald-500" />
+              <Button variant="outline">Join</Button>
             </div>
-            
-            {/* Mobile: New Chat Button */}
-            <div className="lg:hidden p-4 border-b">
-              <Button className="w-full" onClick={handleNewChat}>
-                <PlusIcon className="mr-2 h-4 w-4" />
-                New Chat
-              </Button>
-            </div>
-            
-            {/* Messages Container */}
-            <div className="flex-1 overflow-auto p-4 space-y-4" ref={messagesContainerRef}>
-              {activeChatIndex !== null && 
-                chatHistory[activeChatIndex]?.messages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={`flex ${
-                      message.role === "user" ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    <div
-                      className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                        message.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted"
-                      }`}
-                    >
-                      {message.content}
-                    </div>
-                  </div>
-                ))}
-              
-              {activeChatIndex === null && (
-                <div className="flex flex-col items-center justify-center h-full text-center p-8">
-                  <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                    <MessageSquareIcon className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                  <h3 className="text-lg font-medium mb-2">Start a new conversation</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Your AI mentor is here to help you learn and grow
-                  </p>
-                  <Button onClick={handleNewChat}>
-                    <PlusIcon className="mr-2 h-4 w-4" />
-                    New Chat
-                  </Button>
-                </div>
-              )}
-            </div>
-            
-            {/* Message Input */}
-            <div className="p-4 border-t">
-              <form onSubmit={handleSubmit} className="flex gap-2">
-                <Input
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Type your message..."
-                  className="flex-1"
-                  autoFocus
-                  ref={inputRef}
-                />
-                <Button type="submit" disabled={!inputMessage.trim()}>
-                  <SendIcon className="h-4 w-4" />
-                  <span className="sr-only">Send</span>
-                </Button>
-              </form>
-            </div>
-          </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="bg-emerald-50 rounded-lg p-6 border border-emerald-100">
+        <h2 className="text-xl font-semibold mb-4">Welcome to the AI Mentor System</h2>
+        <p className="mb-4">
+          Our advanced AI mentor is here to guide you through your learning journey.
+          Get personalized support, immediate answers to your questions, and
+          tailored recommendations for your blockchain education.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Button className="bg-emerald-500">Start Learning</Button>
+          <Button variant="outline">Watch Demo</Button>
         </div>
       </div>
     </div>
