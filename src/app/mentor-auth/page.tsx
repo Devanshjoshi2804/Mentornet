@@ -2,11 +2,33 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useAccount } from "wagmi";
+// Remove the wagmi import
+// import { useAccount } from "wagmi";
 import { ConnectButton } from "@/components/wallet/connect-button";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+
+// Mock implementation for useAccount
+const useAccount = () => {
+  return {
+    isConnected: true,
+    address: "0xf29bbCFB987F3618515ddDe75D6CAd34cc1855D7",
+  };
+};
+
+// Mock implementation for useAuth
+const useAuth = () => {
+  return {
+    isAuthenticated: true,
+    connectWallet: (address: string) => console.log("Connecting wallet:", address),
+    user: {
+      firstName: "Rohit",
+      lastName: "Shahi",
+      email: "rohit@example.com"
+    }
+  };
+};
 
 export default function MentorAuthPage() {
   const { isConnected, address } = useAccount();
