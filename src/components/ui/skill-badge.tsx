@@ -1,144 +1,90 @@
-import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Clock, LockClosed } from "lucide-react";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import { Badge } from './badge';
+import { cn } from '@/lib/utils';
+import { CheckCircle, Clock, Lock } from 'lucide-react';
 
-// Define the interface for the SkillData
-export interface SkillData {
-  id: string;
+export type SkillData = {
   name: string;
-  category: string;
-  level: number;
-  verificationStatus: "verified" | "pending" | "unverified";
-  transactionHash?: string;
-  progress: number;
-  description: string;
-  verifiedDate?: Date;
-}
+  level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  status: 'verified' | 'pending' | 'unverified';
+  date?: string;
+};
 
-export type SkillVerificationStatus = "verified" | "pending" | "unverified";
-
-// Define variants for the SkillBadge component
-export const skillBadgeVariants = cva(
-  "inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary/10 text-primary hover:bg-primary/20",
-        verified: "bg-green-100 text-green-800 hover:bg-green-200",
-        pending: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-        unverified: "bg-gray-100 text-gray-800 hover:bg-gray-200",
-        secondary: "bg-secondary/10 text-secondary hover:bg-secondary/20",
-        success: "bg-green-100 text-green-800 hover:bg-green-200",
-        warning: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-        destructive: "bg-destructive/10 text-destructive hover:bg-destructive/20",
-      },
-      size: {
-        default: "h-6",
-        sm: "h-5 text-[10px]",
-        lg: "h-7 text-sm",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-);
-
-export interface SkillBadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof skillBadgeVariants> {
+type SkillBadgeProps = {
   skill: SkillData;
-  showVerification?: boolean;
-  showLevel?: boolean;
-}
+  className?: string;
+  onClick?: () => void;
+};
 
-export function SkillBadge({
-  className,
-  variant,
-  size,
-  skill,
-  showVerification = true,
-  showLevel = true,
-  ...props
-}: SkillBadgeProps) {
-  // Determine the variant based on verification status if not specified
-  const badgeVariant = variant || skill.verificationStatus;
+export type SkillVerificationStatus = 'verified' | 'pending' | 'unverified';
+
+export function SkillBadge({ skill, className, onClick }: SkillBadgeProps) {
+  const getStatusIcon = (status: SkillVerificationStatus) => {
+    switch (status) {
+      case 'verified':
+        return <CheckCircle className="h-3.5 w-3.5 mr-1 text-emerald-500" />;
+      case 'pending':
+        return <Clock className="h-3.5 w-3.5 mr-1 text-amber-500" />;
+      case 'unverified':
+        return <Lock className="h-3.5 w-3.5 mr-1 text-gray-500" />;
+    }
+  };
+
+  const getBackgroundColor = (status: SkillVerificationStatus) => {
+    switch (status) {
+      case 'verified':
+        return 'bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-200';
+      case 'pending':
+        return 'bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-200';
+      case 'unverified':
+        return 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200';
+    }
+  };
+
+  const getLevelColor = (level: string) => {
+    switch (level) {
+      case 'beginner':
+        return 'bg-blue-100 text-blue-800';
+      case 'intermediate':
+        return 'bg-purple-100 text-purple-800';
+      case 'advanced':
+        return 'bg-indigo-100 text-indigo-800';
+      case 'expert':
+        return 'bg-rose-100 text-rose-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
-    <div
+    <Badge
+      variant="outline"
       className={cn(
-        skillBadgeVariants({ variant: badgeVariant, size }),
-        className
+        'flex items-center py-1 px-2 text-xs font-medium mr-2 mb-2 cursor-pointer transition-colors',
+        getBackgroundColor(skill.status),
+        className,
       )}
-      {...props}
+      onClick={onClick}
     >
-      <span className="mr-1">{skill.name}</span>
-      
-      {showLevel && (
-        <span className="ml-1 rounded-full bg-black/10 px-1.5 text-[10px]">
-          L{skill.level}
-        </span>
-      )}
-      
-      {showVerification && (
-        <span className="ml-1.5 flex items-center">
-          {skill.verificationStatus === "verified" && (
-            <CheckCircle className="h-3 w-3 text-green-600" />
-          )}
-          {skill.verificationStatus === "pending" && (
-            <Clock className="h-3 w-3 text-yellow-600" />
-          )}
-          {skill.verificationStatus === "unverified" && (
-            <LockClosed className="h-3 w-3 text-gray-600" />
-          )}
-        </span>
-      )}
-    </div>
+      {getStatusIcon(skill.status)}
+      <span>{skill.name}</span>
+      <span className={cn('ml-1.5 px-1.5 py-0.5 rounded-sm text-[0.65rem] leading-none', getLevelColor(skill.level))}>
+        {skill.level}
+      </span>
+    </Badge>
   );
 }
 
-export interface SkillBadgeGroupProps extends React.HTMLAttributes<HTMLDivElement> {
-  skills: SkillData[];
-  limit?: number;
-  showAll?: boolean;
-  badgeSize?: VariantProps<typeof skillBadgeVariants>["size"];
-  showVerification?: boolean;
-  showLevel?: boolean;
-}
-
-export function SkillBadgeGroup({
-  className,
-  skills,
-  limit = 5,
-  showAll = false,
-  badgeSize,
-  showVerification = true,
-  showLevel = true,
-  ...props
-}: SkillBadgeGroupProps) {
-  const displaySkills = showAll ? skills : skills.slice(0, limit);
-  const remainingCount = skills.length - limit;
-
+export function SkillBadgeGroup({ skills, className, onClick }: { skills: SkillData[]; className?: string; onClick?: (skill: SkillData) => void }) {
   return (
-    <div className={cn("flex flex-wrap gap-1.5", className)} {...props}>
-      {displaySkills.map((skill) => (
-        <SkillBadge
-          key={skill.id}
-          skill={skill}
-          size={badgeSize}
-          showVerification={showVerification}
-          showLevel={showLevel}
+    <div className={cn('flex flex-wrap', className)}>
+      {skills.map((skill, index) => (
+        <SkillBadge 
+          key={`${skill.name}-${index}`} 
+          skill={skill} 
+          onClick={onClick ? () => onClick(skill) : undefined}
         />
       ))}
-      
-      {!showAll && remainingCount > 0 && (
-        <Badge variant="outline" className="text-xs">
-          +{remainingCount} more
-        </Badge>
-      )}
     </div>
   );
 } 
