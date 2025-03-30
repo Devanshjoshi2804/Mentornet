@@ -2,13 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useAccount } from "wagmi";
+// Comment out the real wagmi import
+// import { useAccount } from "wagmi";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Home, Settings, User, Workflow } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+
+// Mock implementation for useAccount
+const useAccount = () => {
+  return {
+    isConnected: true,
+    address: "0xf29bbCFB987F3618515ddDe75D6CAd34cc1855D7",
+  };
+};
 
 export default function MentorDashboardPage() {
   const [loading, setLoading] = useState(true);
@@ -47,38 +56,34 @@ export default function MentorDashboardPage() {
   ];
 
   useEffect(() => {
-    if (!isConnected) {
-      toast.error("You must connect your wallet to access the mentor dashboard.");
-      router.push("/mentor-auth"); // Redirect if wallet is not connected
-      return;
-    }
+    // Skip the wallet connection check since we're mocking it
+    // if (!isConnected) {
+    //   toast.error("You must connect your wallet to access the mentor dashboard.");
+    //   router.push("/mentor-auth"); // Redirect if wallet is not connected
+    //   return;
+    // }
 
     const fetchMentorData = async () => {
       try {
         setLoading(true);
         
-        // Get mentor info from Supabase
-        const { data: mentorData, error: mentorError } = await supabase
-          .from("mentors")
-          .select("*")
-          .eq("wallet", address)
-          .single();
+        // Instead of querying Supabase, use mock data
+        const mockMentorData = {
+          id: "1",
+          name: "Rohit Shahi",
+          expertise: "Blockchain Development, Smart Contracts",
+          email: "rohit@example.com",
+          wallet: address,
+          isApproved: true,
+          createdAt: new Date().toISOString(),
+        };
         
-        if (mentorError) {
-          console.error("Error fetching mentor data:", mentorError);
-          toast.error("Error fetching your mentor profile.");
-          if (mentorError.code === "PGRST116") { // Not found
-            router.push("/mentor-auth");
-          }
-          return;
-        }
+        // No need to check for errors, we're providing mock data
+        setMentorInfo(mockMentorData);
         
-        setMentorInfo(mentorData);
-        
-        // Get project stats 
-        // This would ideally come from the blockchain or database
+        // Use static project stats
         setProjectStats({
-          total: 5, // Mock data - replace with actual fetch
+          total: 5,
           assigned: 3,
           completed: 2,
         });
@@ -92,7 +97,7 @@ export default function MentorDashboardPage() {
     };
     
     fetchMentorData();
-  }, [isConnected, router, address]);
+  }, [router, address]);
 
   if (loading) {
     return (
