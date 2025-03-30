@@ -1,6 +1,7 @@
 import { useContractWrite, useContractRead } from "wagmi";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
+import { Mentor } from '@/types/mentor';
 
 // MentorDAO contract address on Polygon Amoy testnet
 const MENTOR_DAO_ADDRESS = "0xAe6AE2A77a3Ef382929a264dB8c56c70e85dB2d1";
@@ -74,6 +75,46 @@ const MENTOR_DAO_ABI = [
     ],
     "stateMutability": "view",
     "type": "function"
+  }
+];
+
+// Mock data and functions since we don't have actual DB access
+const mockPendingMentors: Mentor[] = [
+  {
+    id: '1',
+    name: 'Mentor 001',
+    address: '0xf29bbCFB987F3618515ddDe75D6CAd34cc1855D7',
+    avatar: '/avatars/mentor1.jpg',
+    expertise: ['React', 'Ethereum', 'Solidity'],
+    level: 'Advanced',
+    verificationStatus: 'pending',
+    rating: 4.7,
+    reviews: 42,
+    availability: 'Weekdays',
+    bio: 'Experienced blockchain developer with 5+ years in the industry.',
+    skills: [
+      { name: 'React', level: 'expert', status: 'verified' },
+      { name: 'Ethereum', level: 'advanced', status: 'verified' },
+      { name: 'Solidity', level: 'expert', status: 'verified' }
+    ]
+  },
+  {
+    id: '2',
+    name: 'Mentor 002',
+    address: '0xf29bbCFB987F3618515ddDe75D6CAd34cc1855D7',
+    avatar: '/avatars/mentor2.jpg',
+    expertise: ['Smart Contracts', 'Web3.js', 'DeFi'],
+    level: 'Expert',
+    verificationStatus: 'pending',
+    rating: 4.9,
+    reviews: 38,
+    availability: 'Weekends',
+    bio: 'Smart contract specialist with focus on DeFi protocols.',
+    skills: [
+      { name: 'Smart Contracts', level: 'expert', status: 'verified' },
+      { name: 'Web3.js', level: 'advanced', status: 'verified' },
+      { name: 'DeFi', level: 'intermediate', status: 'verified' }
+    ]
   }
 ];
 
@@ -223,4 +264,31 @@ export function useIsApprovedMentor(address: string) {
     isApproved: contractRead.data || false,
     isLoading: contractRead.isPending,
   };
-} 
+}
+
+// Function to get all pending mentors
+export const getPendingMentors = async (): Promise<Mentor[]> => {
+  // In a real app, this would query the database
+  return Promise.resolve(mockPendingMentors);
+};
+
+// Function to approve a mentor
+export const approveMentor = async (mentorId: string): Promise<boolean> => {
+  // In a real app, this would update the mentor's status in the database
+  console.log(`Approving mentor with ID: ${mentorId}`);
+  return Promise.resolve(true);
+};
+
+// Function to reject a mentor
+export const rejectMentor = async (mentorId: string): Promise<boolean> => {
+  // In a real app, this would update the mentor's status in the database
+  console.log(`Rejecting mentor with ID: ${mentorId}`);
+  return Promise.resolve(true);
+};
+
+// Function to get mentor by ID
+export const getMentorById = async (mentorId: string): Promise<Mentor | null> => {
+  // In a real app, this would query the database
+  const mentor = mockPendingMentors.find(m => m.id === mentorId);
+  return Promise.resolve(mentor || null);
+}; 

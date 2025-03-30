@@ -1,19 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getMockMentors, getMockMentorById, approveMockMentor, rejectMockMentor } from "@/lib/mockData";
 
 // GET /api/mentors - Get all mentors
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const mentors = await prisma.mentor.findMany({
-      select: {
-        id: true,
-        name: true,
-        expertise: true,
-        wallet: true,
-        isApproved: true,
-        createdAt: true,
-      },
-    });
+    // Use mock data instead of prisma
+    const mentors = await getMockMentors();
     
     return NextResponse.json(mentors);
   } catch (error) {
@@ -28,47 +20,28 @@ export async function GET(req: NextRequest) {
 // POST /api/mentors - Create a new mentor
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { name, expertise, email, wallet, tx_hash } = body;
-
-    // Check for required fields
-    if (!name || !expertise || !email || !wallet || !tx_hash) {
+    const data = await req.json();
+    
+    // Validate required fields
+    if (!data.name || !data.wallet || !data.expertise) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
     }
-
-    // Check if mentor already exists with the same wallet or email
-    const existingMentor = await prisma.mentor.findFirst({
-      where: {
-        OR: [
-          { wallet },
-          { email },
-        ],
-      },
-    });
-
-    if (existingMentor) {
-      return NextResponse.json(
-        { error: "Mentor already exists with this wallet or email" },
-        { status: 409 }
-      );
-    }
-
-    // Create new mentor
-    const mentor = await prisma.mentor.create({
-      data: {
-        name,
-        expertise,
-        email,
-        wallet,
-        tx_hash,
+    
+    // In a real app, this would create a new mentor in the database
+    // For now, we'll just mock a successful response
+    return NextResponse.json(
+      { 
+        id: "new-mentor-id", 
+        ...data,
         isApproved: false,
+        createdAt: new Date().toISOString()
       },
-    });
-
-    return NextResponse.json(mentor, { status: 201 });
+      { status: 201 }
+    );
+    
   } catch (error) {
     console.error("Error creating mentor:", error);
     return NextResponse.json(
@@ -78,33 +51,67 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// PATCH /api/mentors/:id - Update mentor approval status
-export async function PATCH(req: NextRequest) {
+// GET /api/mentors/:id - Get a specific mentor
+export async function GET_MENTOR(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const body = await req.json();
-    const { wallet, isApproved } = body;
-
-    if (!wallet) {
+    const mentor = await getMockMentorById(params.id);
+    
+    if (!mentor) {
       return NextResponse.json(
-        { error: "Missing wallet address" },
+        { error: "Mentor not found" },
+        { status: 404 }
+      );
+    }
+    
+    return NextResponse.json(mentor);
+  } catch (error) {
+    console.error("Error fetching mentor:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch mentor" },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT /api/mentors/:id/approve - Approve a mentor
+export async function APPROVE_MENTOR(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const success = await approveMockMentor(params.id);
+    
+    if (!success) {
+      return NextResponse.json(
+        { error: "Failed to approve mentor" },
         { status: 400 }
       );
     }
-
-    const mentor = await prisma.mentor.update({
-      where: {
-        wallet,
-      },
-      data: {
-        isApproved,
-      },
-    });
-
-    return NextResponse.json(mentor);
+    
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error updating mentor:", error);
+    console.error("Error approving mentor:", error);
     return NextResponse.json(
-      { error: "Failed to update mentor" },
+      { error: "Failed to approve mentor" },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT /api/mentors/:id/reject - Reject a mentor
+export async function REJECT_MENTOR(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const success = await rejectMockMentor(params.id);
+    
+    if (!success) {
+      return NextResponse.json(
+        { error: "Failed to reject mentor" },
+        { status: 400 }
+      );
+    }
+    
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error rejecting mentor:", error);
+    return NextResponse.json(
+      { error: "Failed to reject mentor" },
       { status: 500 }
     );
   }

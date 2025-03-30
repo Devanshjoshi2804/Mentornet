@@ -1,142 +1,116 @@
-"use client";
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { getPendingMentors } from '@/lib/mentorUtils';
+import { Badge } from '@/components/ui/badge';
 
-import { useState, useEffect } from "react";
-import { useAccount } from "wagmi";
-import { getPendingMentors, approveMentor } from "@/lib/mentorUtils";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Loader2 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { toast } from "sonner";
-
-// The wallet address of the admin - replace with your own or environment variable
-const ADMIN_WALLET = "0xf29bbCFB987F3618515ddDe75D6CAd34cc1855D7";
-
-export default function AdminPage() {
-  const { address, isConnected } = useAccount();
-  const [pendingMentors, setPendingMentors] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [approving, setApproving] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (isConnected && address === ADMIN_WALLET) {
-      fetchPendingMentors();
-    }
-  }, [isConnected, address]);
-
-  async function fetchPendingMentors() {
-    setLoading(true);
-    try {
-      const mentors = await getPendingMentors();
-      setPendingMentors(mentors);
-    } catch (error) {
-      console.error("Error fetching pending mentors:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleApprove(mentorAddress: string) {
-    setApproving(mentorAddress);
-    try {
-      const result = await approveMentor(mentorAddress);
-      if (result.success) {
-        setPendingMentors((prev) =>
-          prev.filter((addr) => addr !== mentorAddress)
-        );
-      } else {
-        throw new Error(result.message);
-      }
-    } catch (error: any) {
-      console.error("Error approving mentor:", error);
-      toast.error(error.message || "Failed to approve mentor");
-    } finally {
-      setApproving(null);
-    }
-  }
-
-  if (!isConnected) {
-    return (
-      <p className="text-center text-lg font-semibold p-10">
-        Please connect your wallet to access the admin panel.
-      </p>
-    );
-  }
-
-  if (address !== ADMIN_WALLET) {
-    return (
-      <p className="text-center text-lg font-semibold text-red-500 p-10">
-        Access Denied: Admin Only
-      </p>
-    );
-  }
-
+// Mock function for admin dashboard
+export default async function AdminDashboard() {
+  // Get pending mentors
+  const pendingMentors = await getPendingMentors();
+  
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-4">
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle>Total Mentors</CardTitle>
+            <CardDescription>Total registered mentors</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-4xl font-bold">24</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle>Pending Approvals</CardTitle>
+            <CardDescription>Mentors awaiting approval</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-4xl font-bold">{pendingMentors.length}</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle>Active Sessions</CardTitle>
+            <CardDescription>Current mentor-student sessions</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-4xl font-bold">12</p>
+          </CardContent>
+        </Card>
+      </div>
+      
       <Card>
         <CardHeader>
-          <CardTitle>Admin Panel - Pending Mentors</CardTitle>
-          <CardDescription>Approve mentor applications</CardDescription>
+          <CardTitle>Pending Mentor Approvals</CardTitle>
+          <CardDescription>
+            Verify and approve new mentor registrations
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <p className="text-center">Loading pending mentors...</p>
-          ) : pendingMentors.length === 0 ? (
-            <p className="text-center text-green-500">No pending mentors.</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Mentor Address</TableHead>
-                  <TableHead>Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pendingMentors.map((mentor) => (
-                  <TableRow key={mentor}>
-                    <TableCell className="font-mono">{mentor}</TableCell>
-                    <TableCell>
-                      <Button
-                        onClick={() => handleApprove(mentor)}
-                        disabled={approving === mentor}
-                        className="bg-emerald-500"
-                      >
-                        {approving === mentor ? (
-                          <Loader2 className="animate-spin h-4 w-4" />
-                        ) : (
-                          "Approve"
-                        )}
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-4 px-2">Name</th>
+                  <th className="text-left py-4 px-2">Expertise</th>
+                  <th className="text-left py-4 px-2">Wallet Address</th>
+                  <th className="text-left py-4 px-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingMentors.length > 0 ? (
+                  pendingMentors.map((mentor) => (
+                    <tr key={mentor.id} className="border-b hover:bg-gray-50">
+                      <td className="py-4 px-2">{mentor.name}</td>
+                      <td className="py-4 px-2">
+                        <div className="flex flex-wrap gap-1">
+                          {mentor.expertise.map((skill, index) => (
+                            <Badge key={index} variant="outline" className="bg-blue-50">
+                              {skill}
+                            </Badge>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="py-4 px-2">
+                        <span className="font-mono text-sm">
+                          {mentor.address.substring(0, 6)}...{mentor.address.substring(mentor.address.length - 4)}
+                        </span>
+                      </td>
+                      <td className="py-4 px-2">
+                        <div className="flex gap-2">
+                          <form action="/api/admin/approve" method="POST">
+                            <input type="hidden" name="mentorId" value={mentor.id} />
+                            <Button type="submit" variant="default" size="sm">
+                              Approve
+                            </Button>
+                          </form>
+                          <form action="/api/admin/reject" method="POST">
+                            <input type="hidden" name="mentorId" value={mentor.id} />
+                            <Button type="submit" variant="destructive" size="sm">
+                              Reject
+                            </Button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="py-4 text-center text-gray-500">
+                      No pending mentors to approve
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
-        <CardFooter className="flex justify-end">
-          <Button 
-            onClick={fetchPendingMentors} 
-            variant="outline"
-            disabled={loading}
-          >
-            Refresh
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );
