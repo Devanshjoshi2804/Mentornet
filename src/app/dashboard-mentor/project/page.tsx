@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAccount } from "wagmi";
-import { mentorDAO } from "@/lib/blockchain";
+// Comment out the real wagmi import
+// import { useAccount } from "wagmi";
 import { toast } from "sonner";
 import { 
   Card, 
@@ -17,6 +17,65 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Plus, User } from "lucide-react";
+
+// Mock implementation for useAccount
+const useAccount = () => {
+  return {
+    isConnected: true,
+    address: "0xf29bbCFB987F3618515ddDe75D6CAd34cc1855D7",
+  };
+};
+
+// Mock implementation for mentorDAO
+const mentorDAO = {
+  getMentorProjects: async (mentorAddress: string) => {
+    // Return mock project IDs
+    console.log(`Fetching projects for mentor: ${mentorAddress}`);
+    return [1, 2, 3];
+  },
+  
+  getProjectDetails: async (projectId: number) => {
+    // Return mock project details
+    console.log(`Fetching details for project: ${projectId}`);
+    
+    // Create different mock projects based on ID
+    const mockProjects = {
+      1: {
+        id: 1,
+        mentor: "0xf29bbCFB987F3618515ddDe75D6CAd34cc1855D7",
+        student: "0x0000000000000000000000000000000000000000",
+        projectName: "Create a Simple DApp",
+        projectDescription: "Develop a decentralized application that interacts with a smart contract on the Ethereum blockchain.",
+        skillArea: "Blockchain, Solidity, React",
+        isAssigned: false,
+        isCompleted: false
+      },
+      2: {
+        id: 2,
+        mentor: "0xf29bbCFB987F3618515ddDe75D6CAd34cc1855D7",
+        student: "0x1234567890123456789012345678901234567890",
+        projectName: "NFT Marketplace",
+        projectDescription: "Build an NFT marketplace where users can mint, buy, and sell digital assets.",
+        skillArea: "NFTs, Smart Contracts, Web Development",
+        isAssigned: true,
+        isCompleted: false
+      },
+      3: {
+        id: 3,
+        mentor: "0xf29bbCFB987F3618515ddDe75D6CAd34cc1855D7",
+        student: "0x2345678901234567890123456789012345678901",
+        projectName: "ERC-20 Token Development",
+        projectDescription: "Create an ERC-20 token with custom functionality and deploy it to the Ethereum network.",
+        skillArea: "Tokenomics, Solidity, Testing",
+        isAssigned: true,
+        isCompleted: true
+      }
+    };
+    
+    // Return the mock project based on ID
+    return mockProjects[projectId as keyof typeof mockProjects] || null;
+  }
+};
 
 interface Project {
   id: number;
