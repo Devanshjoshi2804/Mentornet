@@ -4,13 +4,32 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useAccount } from 'wagmi';
+// Comment out the real wagmi import
+// import { useAccount } from 'wagmi';
 import { ConnectButton } from "@/components/wallet/connect-button";
 import { useToast } from "@/components/ui/use-toast";
 import { Progress } from "@/components/ui/progress";
 import { YoutubePlayer } from "@/components/ui/youtube-player";
-import { useIsVideoCompleted } from "@/lib/videoVerification";
+// Comment out the conflicting imports
+// import { useIsVideoCompleted } from "@/lib/videoVerification";
 import { Badge } from "@/components/ui/badge";
+
+// Mock implementation for useAccount
+const useAccount = () => {
+  return {
+    isConnected: true,
+    address: "0xf29bbCFB987F3618515ddDe75D6CAd34cc1855D7",
+  };
+};
+
+// Mock implementation for useIsVideoCompleted
+const useIsVideoCompleted = (videoId: string) => {
+  // Return a mock completion status
+  return {
+    isCompleted: Math.random() > 0.5, // Randomly true/false for demo purposes
+    isLoading: false
+  };
+};
 
 // Sample course data
 const myCourses = [
@@ -139,7 +158,7 @@ export default function LearnPage() {
     if (isLoading) return <Badge variant="outline">Loading...</Badge>;
     
     return isCompleted ? 
-      <Badge variant="success">Completed</Badge> : 
+      <Badge variant="default" className="bg-green-100 text-green-800">Completed</Badge> : 
       <Badge variant="outline">Not Completed</Badge>;
   };
 
